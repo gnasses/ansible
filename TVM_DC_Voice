@@ -1,0 +1,295 @@
+---
+- name: check ios R7-83828
+  hosts: 6K
+  connection: local
+  gather_facts: false
+
+  tasks: 
+   - name: "R7-83828  CVE-2016-6415 IKEv1 Information Disclosure Vulnerability"
+     ios_command:
+      commands: show run | include crypto map|tunnel protection ipsec|crypto gdoi
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check ios R7-83804
+  hosts: 6K
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+   - name: "R7-83804 CVE-2017-3804 IS-IS Packet Processing Denial of Service Vulnerability"
+     ios_command:
+      commands: show run | include isis
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check R7-103837
+  hosts: 6K
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+   - name: "R7-103837 CVE-2008-3821 Cisco IOS HTTP"
+     ios_command:
+      commands: show run | include http
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check R7-103841
+  hosts: 6K
+  connection: local
+  gather_facts: false
+ 
+  tasks:
+
+   - name: "R7-103841 CVE-2009-2868 IOS Software Internet Key Exchange Resource Exhaustion Vulnerability"
+     ios_command:
+      commands: show run | i crypto
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check R7-103847
+  hosts: 6K
+  connection: local
+  gather_facts: false
+ 
+  tasks:
+
+   - name: "R7-103847 CVE-2010-0576 IOS Multiprotocol Label Switching Packet Vulnerability"
+     ios_command:
+      commands: show running-config | include mpls 
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check R7-103857
+  hosts: 6K
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+   - name: "R7-103857 CVE-2013-1142 IOS Network Address Translation Denial of Service Vulnerability"
+     ios_command:
+      commands:
+       - show running-config | include ip nat .* vrf .*
+       - show ip nat statistics
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check R7-103987
+  hosts: 6K
+  connection: local
+  gather_facts: false
+ 
+  tasks:
+
+   - name: "R7-103987 CVE-2017-12240 IOS and IOS XE DHCP Remote Code Execution Vulnerability"
+     ios_command:
+      commands: show running-config | include ip helper-address
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check R7-103992
+  hosts: 6K
+  connection: local
+  gather_facts: false
+ 
+  tasks:
+
+   - name: "R7-103992 CVE-2009-0629 IOS Multiple Features Crafted TCP Sequence Vulnerability"
+     ios_command:
+      commands: 
+       - show running-config | include alps
+       - show running-config | include stun
+       - show running-config | include bstun
+       - show running-config | include ncia
+       - show running-config | include dlsw
+       - show running-config | include source-bridg
+       - show running-config | include pptp
+       - show running-config | include vpdn
+       - show running-config | include x25
+       - show running-config | include xot
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check R7-104044
+  hosts: 6K
+  connection: local
+  gather_facts: false
+ 
+  tasks:
+
+   - name: "R7-104044  CVE-2011-0945 IOS Data-Link Switching Vulnerability"
+     ios_command:
+      commands: show running-config | include dlsw local-peer
+
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check R7-103994
+  hosts: 6K
+  connection: local
+  gather_facts: false
+ 
+  tasks:
+
+   - name: "R7-103994  CVE-2009-0631 IOS Multiple Features Crafted UDP Packet Vulnerability"
+     ios_command:
+      commands: 
+       - show running-config | include ip sla responder
+       - show running-config | include ip sla monitor responder
+       - show running-config | include dial-peer voice
+       - show running-config | include mgcp     
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check R7-104205
+  hosts: 6K
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+   - name: "R7-104205  CVE-2009-0630 - HIGH - IOS Multiple IP Sockets Vulnerability"
+     ios_command:
+      commands:
+       - show running-config | include ip dns
+       - show running-config | include ip director
+       - show running-config | include url-redirect
+       - show running-config | include ip admission
+       - show running-config | include netconf beep
+       - show running-config | include stcapp security
+       - show running-config | include dspfarm profile
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check R7-104212
+  hosts: 6K
+  connection: local
+  gather_facts: false
+ 
+  tasks:
+
+   - name: "R7-104212 CVE-2009-2863 - HIGH - IOS Authentication Proxy Vulnerability"
+     ios_command:
+      commands: show running-config | include ip auth-proxy
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check R7-104267
+  hosts: 6K
+  connection: local
+  gather_facts: false
+ 
+  tasks:
+
+   - name: "R7-104267 cisco-sa-20090923-tunnels - HIGH - IOS Tunnels Vulnerability"
+     ios_command:
+      commands: show running-config | include tunnel
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check R7-128842
+  hosts: 7K 9K
+  connection: local
+  gather_facts: false
+
+  tasks:
+   - name: "R7-128842, R7-128864, R7-128900 - CVE-2018-0304, CVE-2018-314, CVE-2018-308 - HIGH - NX-OS Fabric Services Vuln"
+     nxos_command:
+       commands:
+        - show cfs status
+        - show int br | include fc
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check R7-124111 AND R7-124120 
+  hosts: 6K
+  connection: local
+  gather_facts: false
+ 
+  tasks:
+
+   - name: "R7-124111 AND R7-124120 DC_VOICE - CVE-2018-0175 AND CVE-2018-0167- HIGH - IOS Link Layer Discovery Protocol Buffer Overflow Vulnerabilities"
+     ios_command:
+      commands: 
+       - show lldp
+       - show lldp interface
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check R7-126151
+  hosts: 6K
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+   - name: "R7-126151 DC_VOICE CVE-2011-1640 - HIGH - IOS Software Data-Link Switching Vulnerability"
+     ios_command:
+      commands: show running-config | include dlsw
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check R7-126163 AND R7-126164
+  hosts: 6K
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+   - name: "R7-126163 AND R7-126164 DC_VOICE CVE-2011-2058 AND CVE-2011-2057 - cat6000-dot1x component vulnerability"
+     ios_command:
+      commands: show running-config | include dot1x
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+- name: check R7-140175 
+  hosts: 7K 9K
+  connection: local
+  gather_facts: false
+
+  tasks:
+   - name: "R7-140175 - DC_VOICE - Multiple CVEs - HIGH - NX-OS Lightweight Directory Access Protocol Denial of Service Vulnerabilities"
+     nxos_command:
+       commands: show running-config | include "ldap-server host"
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
