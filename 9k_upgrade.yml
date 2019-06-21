@@ -1,0 +1,49 @@
+---
+- name: Pre-implementation Tasks
+  hosts: mlsmn013wkrm10
+  connection: local
+  gather_facts: false
+
+  tasks: 
+   - name: Save config and show install impact
+     check_mode: no
+     nxos_command:
+       commands: 
+        - copy running-config startup-config
+        - show install all impact nxos bootflash:nxos.7.0.3.I4.5.bin
+       
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+   - pause:
+       minutes: 3
+       
+
+- name: Upgrade Implementation Task
+  hosts: mlsmn013wkrm10
+  connection: local
+  gather_facts: false
+
+  tasks: 
+   - name: Install OS on N9k
+     check_mode: no
+     nxos_install_os:
+       system_image_file: nxos.7.0.3.I4.5.bin
+       issu: desired
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+   - pause:
+       minutes: 3
+
+   - name: Validation of new installed version
+     nxos_command:
+       commands: ['show version | json']
+     register: output
+   - assert:
+       that:
+       - output['stdout'][0]["kickstart_ver_str"] == "7.0(3)I4(5)"
