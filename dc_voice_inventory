@@ -1,0 +1,31 @@
+[7K]
+mlsply20ipt01 ansible_host=10.114.223.1
+mlsply20ipt02 ansible_host=10.114.223.2
+mlsctc01ipt01 ansible_host=10.23.0.1
+mlsctc01ipt02 ansible_host=10.23.0.2 
+mlsctc01ipt03 ansible_host=10.23.0.3 
+mlsctc01ipt04 ansible_host=10.23.0.4 
+mlselr01ipt01 ansible_host=10.186.0.1
+mlselr01ipt02 ansible_host=10.186.0.2 
+mlselr01ipt03 ansible_host=10.186.32.1 
+mlselr01ipt04 ansible_host=10.186.32.2 
+
+[9K]
+mlselr01ipt05 ansible_host=10.173.160.1
+mlselr01ipt06 ansible_host=10.173.160.2
+
+[6K]
+mlselr01ccm01 ansible_host=10.173.0.1
+mlselr01ccm02 ansible_host=10.173.0.2 
+mlselr01ccm03 ansible_host=10.173.0.3
+mlselr01ccm04 ansible_host=10.173.0.4
+mlselr01ccm05 ansible_host=10.173.0.5
+mlselr01ccm06 ansible_host=10.173.0.6
+mlselr01ccm09 ansible_host=10.173.0.9
+mlselr01ccm10 ansible_host=10.173.0.10
+mlselr01ccm11 ansible_host=10.173.0.11
+mlselr01ccm12 ansible_host=10.173.0.12
+mlselr01ccm13 ansible_host=10.173.0.31
+mlselr01ccm14 ansible_host=10.173.0.32
+mlselr01sip05 ansible_host=10.173.0.78
+mlselr01sip06 ansible_host=10.173.0.79
