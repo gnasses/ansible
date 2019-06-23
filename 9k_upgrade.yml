@@ -1,36 +1,54 @@
 ---
-- name: Pre-implementation Tasks
-  hosts: mlsmn013wkrm10
+- name: Verify install impact switch 1
+  hosts: nexusupgrade1
   connection: local
   gather_facts: false
 
   tasks: 
-   - name: Save config and show install impact
+   - name: show install impact
      check_mode: no
      nxos_command:
-       commands: 
-        - copy running-config startup-config
-        - show install all impact nxos bootflash:nxos.7.0.3.I4.5.bin
-       
+       commands: show install all impact nxos bootflash:{{current_nxos_9k_version}}
+       timeout: 300
 
      register: print_output
 
    - debug: var=print_output.stdout_lines
 
+#add validation here instead of pause?
    - pause:
        minutes: 3
-       
 
-- name: Upgrade Implementation Task
-  hosts: mlsmn013wkrm10
+- name: Verify install impact switch 2
+  hosts: nexusupgrade2
   connection: local
   gather_facts: false
 
   tasks: 
-   - name: Install OS on N9k
+   - name: show install impact
+     check_mode: no
+     nxos_command:
+       commands: show install all impact nxos bootflash:{{current_nxos_9k_version}}
+       timeout: 300
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+#add validation here instead of pause?
+   - pause:
+       minutes: 3
+
+- name: Upgrade N9K Code Switch 1 MostRecentVersion
+  hosts: nexusupgrade1
+  connection: local
+  gather_facts: false
+
+  tasks: 
+   - name: Upgrade NX-OS
      check_mode: no
      nxos_install_os:
-       system_image_file: nxos.7.0.3.I4.5.bin
+       system_image_file: "{{current_nxos_9k_version}}"
        issu: desired
 
      register: print_output
@@ -38,12 +56,41 @@
    - debug: var=print_output.stdout_lines
 
    - pause:
-       minutes: 3
+       minutes: 5
 
-   - name: Validation of new installed version
+   - name: Verify newly installed version
      nxos_command:
-       commands: ['show version | json']
+       commands: ['show version | json-pretty']
      register: output
    - assert:
        that:
-       - output['stdout'][0]["kickstart_ver_str"] == "7.0(3)I4(5)"
+       - output['stdout'][0]["kickstart_ver_str"] == '"{{current_show_ver_9k_value}}"'
+       
+#additional validation?
+#repeat tasks for second switch
+- name: Upgrade N9K Code Switch 2 MostRecentVersion
+  hosts: nexusupgrade2
+  connection: local
+  gather_facts: false
+
+  tasks: 
+   - name: Upgrade NX-OS
+     check_mode: no
+     nxos_install_os:
+       system_image_file: "{{current_nxos_9k_version}}"
+       issu: desired
+
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
+
+   - pause:
+       minutes: 5
+
+   - name: Verify newly installed version
+     nxos_command:
+       commands: ['show version | json-pretty']
+     register: output
+   - assert:
+       that:
+       - output['stdout'][0]["kickstart_ver_str"] == '"{{current_show_ver_9k_value}}"'
