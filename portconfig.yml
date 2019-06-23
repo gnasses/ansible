@@ -1,0 +1,31 @@
+---
+- name: basic server port configuration 
+  hosts: mlsmn013wkrm10
+  connection: local
+  gather_facts: false
+
+  tasks: 
+   - name: "interface config"
+     nxos_config:
+      lines:
+        - description connection_to_new_server
+        - switchport mode access
+        - switchport access vlan 30
+      parents: 
+        - interface Ethernet 1/12
+
+
+- name: basic server port verification
+  hosts:  mlsmn013wkrm10
+  connection: local
+  gather_facts: false
+ 
+  tasks:
+
+   - name: "verify interface"
+     nxos_command:
+       commands: show run interface Ethernet1/12
+        
+     register: print_output
+
+   - debug: var=print_output.stdout_lines
