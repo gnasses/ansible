@@ -1,0 +1,25 @@
+---
+- name: Generate Interface report
+  hosts: cisco
+  gather_facts: no
+  connection: network_cli
+
+
+  roles:
+    - ansible-network.network-engine
+
+  tasks:
+    - name: capture show interfaces
+      ios_command:
+        commands:
+          - show interfaces
+      register: output
+    - name: parse the raw output
+      command_parser:
+        file: "parsers/show_interfaces.yaml"
+        content: "{{ output.stdout[0] }}"
+        
+              
+    - name: DISPLAY THE PARSED DATA
+      debug:
+        var: interface_facts 
