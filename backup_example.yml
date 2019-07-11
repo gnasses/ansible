@@ -1,0 +1,17 @@
+---
+- name: backup router configs
+  hosts: cisco
+  connection: network_cli
+  gather_facts: no
+
+  tasks:
+    - name: backup the config
+      ios_config:
+        backup: yes
+      register: config_output
+
+    - name: rename backup
+      copy:
+        src: "{{config_output.backup_path}}"
+        dest: "./backup/{{inventory_hostname}}.config"
+        
