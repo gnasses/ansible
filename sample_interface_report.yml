@@ -14,6 +14,9 @@
         commands:
           - show interfaces
       register: output
+
+#next step needs prefabed parser, show_interfaces.yaml
+
     - name: parse the raw output
       command_parser:
         file: "parsers/show_interfaces.yaml"
