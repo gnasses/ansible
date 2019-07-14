@@ -1,0 +1,90 @@
+---
+- name: Upgrade N9K Code Switch 1 MostRecentVersion
+  hosts: nexusupgrade1
+  connection: network_cli
+  gather_facts: false
+    
+  tasks: 
+   - name: Collect Pre-upgrade ARP Table
+     ignore_errors: yes
+     nxos_command:
+       commands: show ip arp vrf all | xml | i mac|ip-addr-out
+       
+     register: pre_arp
+     
+   - debug: 
+       var: pre_arp
+     
+   - name: Collect Pre-upgrade Routing Table
+     ignore_errors: yes
+     nxos_command:
+       commands: show ip route vrf all | xml | i ipprefix|ipnexthop
+       
+     register: pre_routing
+     
+   - debug: 
+       var: pre_routing 
+       
+   - name: Upgrade NX-OS
+     check_mode: no
+     nxos_install_os:
+       system_image_file: "{{current_nxos_9k_version}}"
+       issu: no
+       
+   - name: Wait for device to go down 
+     ignore_errors: yes
+     wait_for:
+       port: 22
+       state: stopped
+       timeout: 300
+       
+   - name: Reset ssh connection 
+     meta: reset_connection
+       
+   - name: Wait for device to come back up 
+     wait_for_connection:
+       delay: 300
+       timeout: 800
+       
+   - name: Reset ssh connection 
+     meta: reset_connection     
+        
+- name: Switch 1 Comparisons
+  hosts: nexusupgrade1
+  connection: network_cli
+  gather_facts: false
+    
+  tasks:     
+   - name: Collect Post-upgrade ARP Table
+     ignore_errors: yes
+     nxos_command:
+       commands: show ip arp vrf all | xml | i mac|ip-addr-out
+       
+     register: post_arp
+     
+   - debug: 
+       var: post_arp
+       
+   - name: Compare pre and post ARP tables
+     ignore_errors: yes
+     set_fact: arpdiff="{{ pre_arp | difference(post_arp) }}" 
+
+   - debug: 
+       var: arpdiff        
+  
+   - name: Collect Post-upgrade Routing Table
+     ignore_errors: yes
+     nxos_command:
+       commands: show ip route vrf all | xml | i ipprefix|ipnexthop
+       
+     register: post_routing
+     
+   - debug: 
+       var: post_routing    
+ 
+   - name: Compare pre and post Routing tables
+     
+     set_fact: routediff="{{ pre_routing | difference(post_routing) }}" 
+   
+   - debug: 
+       var: routediff
