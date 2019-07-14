@@ -1,0 +1,25 @@
+---
+- name: Backout Template 1, downgrade impact
+  hosts: mlsmn013wkrm10
+  connection: network_cli
+  gather_facts: false
+  vars:
+    ansible_network_os: nxos
+    backout_9k_version: nxos.7.0.3.I3.1.bin
+    backout_show_ver_value: 7.0(3)I3(1)
+
+  tasks: 
+   - name: show downgrade impact
+     check_mode: no
+     nxos_command:
+       commands: show install all impact nxos bootflash:{{backout_9k_version}}
+
+     register: downgrade_impact
+
+   - debug: var=downgrade_impact.stdout_lines
+   
+   - name: fail the play if upgrade check did not succeed
+     fail:
+       msg: "Pre-Upgrade Check Failed!"
+     when: "'Pre-upgrade check failed' in downgrade_impact.stdout"
+     
