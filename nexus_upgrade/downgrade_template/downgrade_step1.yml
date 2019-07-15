@@ -1,0 +1,20 @@
+---
+- name: Backout Template 1, downgrade impact
+  hosts: mlsmn013wkrm10
+  connection: network_cli
+  gather_facts: no
+
+  tasks: 
+   - name: show downgrade impact
+     check_mode: no
+     nxos_command:
+       commands: show install all impact nxos bootflash:{{backout_9k_version}}
+
+     register: downgrade_impact
+
+   - debug: var=downgrade_impact.stdout_lines
+   
+   - name: fail the play if upgrade check did not succeed
+     fail:
+       msg: "Pre-Upgrade Check Failed!"
+     when: "'Pre-upgrade check failed' in downgrade_impact.stdout"
