@@ -1,0 +1,35 @@
+[nexusupgrade1]
+mlsmn013wkrm10 ansible_host=172.24.3.70
+
+[nexusupgrade2]
+mlsmn013wkrm10 ansible_host=172.24.3.70
+
+[nexusupgrade2:vars]
+ansible_network_os=nxos
+ansible_command_timeout=800
+ansible_connect_timeout=800
+backout_9k_version=nxos.7.0.3.I3.1.bin
+backout_show_ver_value=7.0(3)I3(1)
+current_nxos_9k_version=nxos.7.0.3.I7.6.bin
+current_show_ver_9k_value=7.0(3)I7(6)
+current_ver_checksum=<file_content_md5sum>aea740774c1ef22585ac40f1134d3ed6
+
+[nexusupgrade1:vars]
+ansible_network_os=nxos
+ansible_command_timeout=800
+ansible_connect_timeout=800
+backout_9k_version=nxos.7.0.3.I3.1.bin
+backout_show_ver_value=7.0(3)I3(1)
+current_nxos_9k_version=nxos.7.0.3.I7.6.bin
+current_show_ver_9k_value=7.0(3)I7(6)
+current_ver_checksum=<file_content_md5sum>aea740774c1ef22585ac40f1134d3ed6
+
+[all:vars]
+ansible_network_os=nxos
+ansible_command_timeout=800
+ansible_connect_timeout=800
+backout_9k_version=nxos.7.0.3.I3.1.bin
+backout_show_ver_value=7.0(3)I3(1)
+current_nxos_9k_version=nxos.7.0.3.I7.6.bin
+current_show_ver_9k_value=7.0(3)I7(6)
+current_ver_checksum=<file_content_md5sum>aea740774c1ef22585ac40f1134d3ed6
