@@ -1,0 +1,154 @@
+---
+- name: check for discards
+  hosts: 7K 9K
+  connection: network_cli
+  gather_facts: no 
+
+  tasks: 
+   - name: Initial discards
+     nxos_command:
+       commands: show interface | xml | i iscard>^0
+
+- name: check for drops
+  hosts: 6K
+  connection: network_cli
+  gather_facts: no
+
+  tasks: 
+   - name: Initial drops
+     ios_command:
+       commands: show interface | i drops
+     register: drops 
+
+
+   - pause:
+       seconds: 30
+
+
+- name: check for 30sec discards
+  hosts: 7K 9K
+  connection: network_cli
+  gather_facts: no
+  
+  tasks: 
+   - name: Check 30sec discards
+     nxos_command:
+       commands: show interface | xml | i iscard>^0 | diff
+     register: discards_30sec
+     
+   - debug: var=discards_30sec.stdout_lines
+       
+- name: check for 30sec drops
+  hosts: 6K
+  connection: network_cli
+  gather_facts: no
+
+  tasks: 
+   - name: Check 30sec drops
+     ios_command:
+       commands: show interface | i drops
+     register: drops_30sec
+     
+   - name: Diff drops 30secs  
+     set_fact: diff_30sec="{{ drops | difference(drops_30sec) }}" 
+   
+   - debug: 
+       var: diff_30sec
+
+
+   - pause:
+       seconds: 30
+
+- name: check for 60sec discards
+  hosts: 7K 9K
+  connection: network_cli
+  gather_facts: no
+  
+  tasks: 
+   - name: Check 60sec discards
+     nxos_command:
+       commands: show interface | xml | i iscard>^0 | diff
+     register: discards_60sec
+   - debug: var=discards_60sec.stdout_lines
+       
+- name: check for 60sec drops
+  hosts: 6K
+  connection: network_cli
+  gather_facts: no
+
+  tasks: 
+   - name: Check 60sec drops
+     ios_command:
+       commands: show interface | i drops
+     register: drops_60sec
+     
+   - name: Diff drops 60secs  
+     set_fact: diff_60sec="{{ drops | difference(drops_60sec) }}" 
+   
+   - debug: 
+       var: diff_60sec
+
+   - pause:
+       minutes: 4
+
+- name: check for 5min discards
+  hosts: 7K 9K
+  connection: network_cli
+  gather_facts: no
+  
+  tasks: 
+   - name: Check 5min discards
+     nxos_command:
+       commands: show interface | xml | i iscard>^0 | diff
+     register: discards_5min
+   - debug: var=discards_5min.stdout_lines
+       
+- name: check for 5min drops
+  hosts: 6K
+  connection: network_cli
+  gather_facts: no
+
+  tasks: 
+   - name: Check 5min drops
+     ios_command:
+       commands: show interface | i drops
+     register: drops_5min
+     
+   - name: Diff drops 5min  
+     set_fact: diff_5min="{{ drops | difference(drops_5min) }}" 
+   
+   - debug: 
+       var: diff_5min
+       
+   - pause:
+       minutes: 5
+
+
+- name: check for 10min discards
+  hosts: 7K 9K
+  connection: network_cli
+  gather_facts: no
+  
+  tasks: 
+   - name: Check 10min discards
+     nxos_command:
+       commands: show interface | xml | i iscard>^0 | diff
+     register: discards_10min
+   - debug: var=discards_10min.stdout_lines
+       
+- name: check for 10min drops
+  hosts: 6K
+  connection: network_cli
+  gather_facts: no
+
+  tasks: 
+   - name: Check 10min drops
+     ios_command:
+       commands: show interface | i drops
+     register: drops_10min
+     
+   - name: Diff drops 10min
+     set_fact: diff_10min="{{ drops | difference(drops_10min) }}" 
+   
+   - debug: 
+       var: diff_10min
