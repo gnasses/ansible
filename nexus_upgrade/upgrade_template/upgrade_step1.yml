@@ -1,0 +1,80 @@
+---
+- name: Verify checksum switch 1
+  hosts: nexusupgrade1
+  connection: network_cli
+  gather_facts: no
+
+  tasks: 
+   - name: Find Checksum
+     nxos_command:
+       commands: show file bootflash:{{current_nxos_9k_version}} md5 | xml | i <file_content_md5sum>
+       
+     register: checksum1
+     
+   - assert:
+       that:
+         - "'{{ current_ver_checksum }}'in checksum1.stdout"
+
+- name: Verify checksum switch 2
+  hosts: nexusupgrade2
+  connection: network_cli
+  gather_facts: no
+
+  tasks: 
+   - name: Find Checksum
+     nxos_command:
+       commands: show file bootflash:{{current_nxos_9k_version}} md5 | xml | i <file_content_md5sum>
+       
+     register: checksum2
+     
+   - assert:
+       that:
+         - "'{{ current_ver_checksum }}'in checksum2.stdout"
+       
+- name: Verify install impact switch 1
+  hosts: nexusupgrade1
+  connection: network_cli
+  gather_facts: no
+
+  tasks: 
+   - name: Save config
+     nxos_command:
+       commands: copy running-config startup-config
+       
+   - name: show install impact1
+     check_mode: no
+     nxos_command:
+       commands: show install all impact nxos bootflash:{{current_nxos_9k_version}}
+
+     register: impact1
+
+   - debug: var=impact1.stdout_lines
+
+   - name: fail the play if upgrade check did not succeed
+     fail:
+       msg: "Pre-Upgrade Check Failed!"
+     when: "'Pre-upgrade check failed' in impact1.stdout"
+     
+- name: Verify install impact switch 2
+  hosts: nexusupgrade2
+  connection: network_cli
+  gather_facts: no
+    
+  tasks:
+   - name: Save config
+     nxos_command:
+       commands: copy running-config startup-config
+       
+   - name: show install impact2
+     check_mode: no
+     nxos_command:
+       commands: show install all impact nxos bootflash:{{current_nxos_9k_version}}
+
+     register: impact2
+
+   - debug: var=impact2.stdout_lines
+
+   - name: fail the play if upgrade check did not succeed
+     fail:
+       msg: "Pre-Upgrade Check Failed!"
+     when: "'Pre-upgrade check failed' in impact2.stdout" 
