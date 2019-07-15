@@ -1,0 +1,27 @@
+---
+- name: Verify N9K Code Switch 1 MostRecentVersion
+  hosts: all
+  serial: 1
+  connection: network_cli
+  gather_facts: false
+    
+  tasks: 
+   - name: Show New Version
+     nxos_command:
+       commands: ['show version | i NXOS:']
+     register: final_version
+     
+   - debug: var=final_version
+
+   - name: Gather NXOS facts
+     nxos_facts:
+       gather_subset:
+         - legacy
+     register: output
+     
+   - name: CURRENT OS VERSION
+     debug: var=os
+     
+   - assert:
+       that:
+         - "'{{ os }}' == '{{ current_show_ver_9k_value }}'" 
