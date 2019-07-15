@@ -1,0 +1,23 @@
+---
+- name: Backout Template 2, Downgrade N9K Code 
+  hosts: mlsmn013wkrm10
+  connection: network_cli
+  gather_facts: no
+
+  tasks: 
+   - name: Install OS on N9k
+     check_mode: no
+     nxos_install_os:
+       system_image_file: "{{backout_9k_version}}"
+       issu: desired
+
+   - pause: 
+       minutes: 2
+       
+   - name: Wait for device to come back up 
+     wait_for:
+       host: "{{ ansible_host }}"
+       port: 22
+       sleep: 30
+       connect_timeout: 600
+       
