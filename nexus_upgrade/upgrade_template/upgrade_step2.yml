@@ -1,0 +1,95 @@
+---
+- name: Upgrade N9K Code Switch 1 MostRecentVersion
+  hosts: all
+  connection: network_cli
+  serial: 1
+  gather_facts: false
+    
+  tasks: 
+   - name: Collect Pre-upgrade ARP Table
+     nxos_command:
+       commands: show ip arp vrf all | xml | i mac|ip-addr-out
+       wait_for:
+         - result[0] contains mac
+       retries: 20
+       interval: 10
+       
+     register: pre_arp
+     
+   - debug: var=pre_arp
+     
+   - name: Collect Pre-upgrade Routing Table
+     ignore_errors: yes
+     nxos_command:
+       commands: show ip route vrf all | xml | i ipprefix|ipnexthop
+       wait_for:
+         - result[0] contains ipprefix
+       retries: 20
+       interval: 10
+       
+     register: pre_routing
+     
+   - debug: var=pre_routing 
+       
+   - name: Upgrade NX-OS
+     check_mode: no
+     nxos_install_os:
+       system_image_file: "{{current_nxos_9k_version}}"
+       issu: false
+       
+   - pause:
+       minutes: 2
+       
+      
+   - name: Wait for device to come back up 
+     wait_for:
+       host: "{{ ansible_host }}" 
+       port: 22
+       sleep: 30
+       connect_timeout: 800
+          
+        
+- name: Post Upgrade Comparisons
+  hosts: all
+  serial: 1
+  connection: network_cli
+  gather_facts: false
+    
+  tasks:     
+   - name: Collect Post-upgrade ARP Table
+     ignore_errors: yes
+     nxos_command:
+       commands: show ip arp vrf all | xml | i mac|ip-addr-out
+       wait_for:
+         - result[0] contains mac
+       retries: 20
+       interval: 10
+       
+     register: post_arp
+     
+   - debug: var=post_arp
+       
+   - name: Compare pre and post ARP tables
+     ignore_errors: yes
+     set_fact: arpdiff="{{ post_arp | difference(pre_arp) }}" 
+
+   - debug: var=arpdiff       
+  
+   - name: Collect Post-upgrade Routing Table
+     ignore_errors: yes
+     nxos_command:
+       commands: show ip route vrf all | xml | i ipprefix|ipnexthop
+       wait_for:
+         - result[0] contains ipprefix
+       retries: 20
+       interval: 10
+
+     register: post_routing
+     
+   - debug: var=post_routing   
+ 
+   - name: Compare pre and post Routing tables
+     ignore_errors: yes    
+     set_fact: routediff="{{ pre_routing | difference(post_routing) }}" 
+   
+   - debug: var=routediff
