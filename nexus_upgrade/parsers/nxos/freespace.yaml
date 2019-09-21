@@ -1,0 +1,12 @@
+---
+- name: PARSER META DATA
+  parser_metadata:
+    version: 1.0
+    command: dir bootflash
+    network_os: nxos
+    
+- name: MATCH PATTERN
+  pattern_match:
+    regex: "^(\\S+)\\s+\\S+\\s+\\S+"
+  register: freespace
+  export: yes
