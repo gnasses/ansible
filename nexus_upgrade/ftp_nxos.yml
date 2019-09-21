@@ -1,0 +1,81 @@
+---
+- name: Check for valid image File
+  hosts: 
+    - nexusupgrade1
+    - nexusupgrade2
+  connection: network_cli
+  gather_facts: false
+  vars:
+    ansible_network_os: nxos
+
+  roles:
+    - role: '/var/lib/awx/projects/_72___audits_and_enhancements/roles/network-engine'
+
+  tasks: 
+   - name: Check for valid file and register checksum
+     nxos_command:
+       commands: show file bootflash:{{current_nxos_9k_version}} md5 | xml | i <file_content_md5sum>
+     register: filepresent
+   - debug: var=filepresent
+        
+
+- name: Copy image File
+  hosts: 
+    - nexusupgrade1
+    - nexusupgrade2
+  connection: network_cli
+  gather_facts: false
+  vars:
+    ansible_network_os: nxos
+
+  tasks:
+   - name: Delete file if no valid checksum
+     nxos_command:
+       commands: delete bootflash:{{current_nxos_9k_version}} no-prompt
+     when: "not (current_ver_checksum in filepresent.stdout[0])
+     
+   - name: Verify Free Space for Image
+     nxos_command: 
+       commands: 'dir bootflash: | i free'
+     register: bootflash
+     
+   - name: Freespace to Variable Parser
+     command_parser:
+       file: "parsers/nxos/freespace.yaml"
+       content: "{{ bootflash.stdout[0] }}"
+   - debug: var=freespace
+      
+   - name: FTP new image file if file with valid checksum not present
+     cli_command:
+       command: "copy ftp://10.87.32.180/{{current_nxos_9k_version}} bootflash:{{current_nxos_9k_version}} vrf default"
+       check_all: True
+       prompt: 
+         - 'Enter username:'
+         - 'Password:'
+
+       answer: 
+         - '{{ftp_user}}'
+         - '{{ftp_password}}'
+     when: 
+       - "not (current_ver_checksum in filepresent.stdout[0])" 
+       - "freespace > 1011037696"
+
+- name: Verify checksum switch 1
+  hosts: 
+    - nexusupgrade1
+    - nexusupgrade2
+  connection: network_cli
+  gather_facts: false
+  vars:
+    ansible_network_os: nxos
+
+  tasks: 
+   - name: Find Checksum
+     nxos_command:
+       commands: show file bootflash:{{current_nxos_9k_version}} md5 | xml | i <file_content_md5sum>
+       
+     register: checksum1
+     
+   - assert:
+       that:
+         - "'{{ current_ver_checksum }}'in checksum1.stdout"
