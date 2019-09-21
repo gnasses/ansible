@@ -1,0 +1,27 @@
+---
+- name: PARSER META DATA
+  parser_metadata:
+    version: 1.0
+    command: show ip access-list snmp59
+    network_os: nxos
+    
+- name: MATCH SEQNO
+  pattern_match:
+    regex: "^\\s+(\\d+)\\s+.*"
+    match_all: yes
+  register: parsed_seqno
+  export: yes
+
+- name: MATCH REMARKS
+  pattern_match:
+    regex: "^\\s+(\\d+\\s+\\S+\\s+\\S+)$"
+    match_all: yes
+  register: parsed_remarks
+  export: yes
+  
+- name: MATCH LINES
+  pattern_match:
+    regex: "^\\s+(\\d+\\s+\\S+\\s+\\S+\\s\\S+\\s+\\S+\\s+\\S+\\s+\\S+)"
+    match_all: yes
+  register: parsed_lines
+  export: yes
