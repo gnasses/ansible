@@ -1,0 +1,7 @@
+[snmp59update]
+mlsctc01isp01 ansible_host=1.1.1.1
+
+[snmp59update:vars]
+ansible_network_os=nxos
+ansible_user={{ username }}
+ansible_password={{ password }}
