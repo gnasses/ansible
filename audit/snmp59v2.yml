@@ -1,6 +1,6 @@
 ---
 - name: SNMP Verify with Error Handling
-  hosts: snmp59pilot
+  hosts: snmp59update
   connection: network_cli
   gather_facts: false
   
