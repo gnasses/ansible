@@ -1,0 +1,11 @@
+---
+vars:
+   sequencenumbers:
+      seqno: "{{item.seqno}}"
+            
+# Put host and whitespace zero or one time before net_ip
+keys:
+   subnets:
+      type: list
+      value: "{{sequencenumbers}}"
+      items: "^\\s+(?P<seqno>\\d+)\\s+.*+"
