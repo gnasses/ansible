@@ -1,0 +1,7 @@
+[group1]
+hostname ansible_host=x.x.x.x
+
+[group1:vars]
+ansible_network_os=nxos
+ansible_user={{ username }}
+ansible_password={{ password }}
