@@ -1,0 +1,31 @@
+---
+
+- name: PLAYBOOK NAME
+  hosts: PUT HOSTNAME OR GROUP FROM INVENTORY HERE
+  connection: network_cli
+  gather_facts: false
+  tasks:
+  
+   - name: SAVE A BACKUP CONFIG
+     nxos_config:
+       backup: yes
+
+   - name: TASK
+# configuration task example
+#     nxos_config:
+#       lines:
+#          -
+# non-config task example
+#     nxos_command:
+#     commands:
+#       -
+
+# notify handler to save the config when done
+     notify:
+       - Save Configuration
+
+  handlers:
+
+  - name: "Save Configuration"
+    nxos_command:
+      commands: "copy running-config startup-config"
