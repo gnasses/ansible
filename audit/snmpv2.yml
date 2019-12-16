@@ -1,11 +1,11 @@
 ---
 - name: SNMP Verify with Error Handling
-  hosts: snmp59update
+  hosts: snmpupdate
   connection: network_cli
   gather_facts: false
   
   roles:
-    - role: '/var/lib/awx/projects/_72___audits_and_enhancements/roles/network-engine'
+    - role: '/var/lib/awx/projects/myproject/roles/network-engine'
   
   tasks:
   
@@ -15,12 +15,12 @@
           backup: yes
         when: not ansible_check_mode  
       - nxos_command:
-          commands: show ip access-list snmp59
-        register: runsnmp59
-      - debug: var=runsnmp59
+          commands: show ip access-list snmp
+        register: runsnmp
+      - debug: var=runsnmp
       - assert:
           that:
-            - "'{{ item }}' in runsnmp59.stdout_lines[0]"
+            - "'{{ item }}' in runsnmp.stdout_lines[0]"
         with_items:
           - "        100 remark DC1"
           - "        110 permit udp 10.176.0.0/14 any eq snmp "
@@ -47,40 +47,40 @@
           - "        530 permit udp 10.75.1.86/32 any eq snmp"
     rescue:
       - command_parser:
-          file: "parsers/nxos/show_snmp59.yaml"
-          content: "{{ runsnmp59.stdout[0] }}"        
+          file: "parsers/nxos/show_snmp.yaml"
+          content: "{{ runsnmp.stdout[0] }}"        
       - debug: var=parsed_seqno
       - nxos_config:
           lines:
           - "no {{ item.matches }}"
-          parents: ip access-list snmp59
+          parents: ip access-list snmp
         with_items: "{{ parsed_seqno }}"
       - nxos_config:
           lines:
           - 100 Remark DC1
-          - 110 permit udp 10.176.0.0/14  any eq snmp
-          - 120 permit udp 10.106.0.0/15 any eq snmp
-          - 130 permit udp 10.119.0.0/16 any eq snmp
-          - 140 permit udp 10.86.0.0/15  any eq snmp
-          - 150 permit udp 10.173.0.0/16  any eq snmp
+          - 110 permit udp 10.1.0.0/14  any eq snmp
+          - 120 permit udp 10.2.0.0/15 any eq snmp
+          - 130 permit udp 10.3.0.0/16 any eq snmp
+          - 140 permit udp 10.4.0.0/15  any eq snmp
+          - 150 permit udp 10.5.0.0/16  any eq snmp
           - 200 Remark DC2
-          - 210 permit udp 10.204.0.0/15 any eq snmp
-          - 220 permit udp 10.122.0.0/15 any eq snmp
-          - 230 permit udp 10.124.0.0/15 any eq snmp
-          - 240 permit udp 10.90.40.0/16 any eq snmp
-          - 250 permit udp 10.223.54.0/23 any eq snmp
+          - 210 permit udp 10.6.0.0/15 any eq snmp
+          - 220 permit udp 10.7.0.0/15 any eq snmp
+          - 230 permit udp 10.8.0.0/15 any eq snmp
+          - 240 permit udp 10.9.1.0/16 any eq snmp
+          - 250 permit udp 10.10.1.0/23 any eq snmp
           - 300 Remark DC3
-          - 310 permit udp 10.112.0.0/16 any eq snmp
-          - 320 permit udp 10.114.0.0/15 any eq snmp
-          - 330 permit udp 10.117.0.0/16 any eq snmp
+          - 310 permit udp 10.11.0.0/16 any eq snmp
+          - 320 permit udp 10.12.0.0/15 any eq snmp
+          - 330 permit udp 10.13.0.0/16 any eq snmp
           - 400 Remark RDC
-          - 410 permit udp 10.5.156.0/24 any eq snmp
+          - 410 permit udp 10.14.1.0/24 any eq snmp
           - 500 Remark LAB
-          - 510 permit udp 10.11.160.0/19 any eq snmp
-          - 520 permit udp 10.11.192.0/19 any eq snmp
+          - 510 permit udp 10.15.1.0/19 any eq snmp
+          - 520 permit udp 10.16.1.0/19 any eq snmp
           - 529 Remark HQ
-          - 530 permit udp 10.75.1.86/32 any eq snmp 
-          parents: ip access-list snmp59
+          - 530 permit udp 10.17.1.86/32 any eq snmp 
+          parents: ip access-list snmp
         notify:
           - Save Configuration
   handlers:
