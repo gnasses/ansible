@@ -2,7 +2,7 @@
 - name: PARSER META DATA
   parser_metadata:
     version: 1.0
-    command: show ip access-list snmp59
+    command: show ip access-list snmp
     network_os: nxos
     
 - name: MATCH SEQNO
