@@ -1,7 +1,7 @@
-[snmp59update]
+[snmpupdate]
 hostname ansible_host=1.1.1.1
 
-[snmp59update:vars]
+[snmpupdate:vars]
 ansible_network_os=nxos
 ansible_user={{ username }}
 ansible_password={{ password }}
