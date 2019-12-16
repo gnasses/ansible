@@ -1,8 +1,8 @@
 [nexusupgrade1]
-mlsmn013wkrm10 ansible_host=172.24.3.70
+test9k1 ansible_host=192.168.1.1
 
 [nexusupgrade2]
-mlsmn013wkrm10 ansible_host=172.24.3.70
+test9k2 ansible_host=192.168.1.2
 
 [nexusupgrade2:vars]
 ansible_network_os=nxos
