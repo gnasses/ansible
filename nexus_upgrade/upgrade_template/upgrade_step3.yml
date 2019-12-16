@@ -1,6 +1,6 @@
 ---
 - name: Verify N9K Code Switch 1 MostRecentVersion
-  hosts: all
+  hosts: nexusupgrade1 nexusupgrade2
   serial: 1
   connection: network_cli
   gather_facts: false
