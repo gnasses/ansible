@@ -1,6 +1,6 @@
 ---
 - name: Backout Template 1, downgrade impact
-  hosts: mlsmn013wkrm10
+  hosts: nexusupgrade1 nexusupgrade2
   connection: network_cli
   gather_facts: no
 
