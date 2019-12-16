@@ -1,7 +1,7 @@
 ---
 
-- name: Add required entries to ACL 59
-  hosts: snmp59update
+- name: Add required entries to SNMP ACL
+  hosts: snmpupdate
   connection: network_cli
   gather_facts: false
   tasks:
@@ -11,7 +11,7 @@
        backup: yes
      when: not ansible_check_mode             
 
-   - name: Fix ACL 59 on NXOS
+   - name: Fix SNMP ACL on NXOS
      nxos_config:
        lines:
          - 100 Remark DC1
@@ -37,7 +37,7 @@
          - 520 permit udp 10.11.192.0/19 any eq snmp
          - 529 Remark HQ
          - 530 permit udp 10.75.1.86/32 any eq snmp 
-       parents: ip access-list snmp59
+       parents: ip access-list snmp
        match: exact
      register: changes
      notify:
