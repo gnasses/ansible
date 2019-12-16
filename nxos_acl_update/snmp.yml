@@ -1,6 +1,6 @@
 ---
 
-- name: Add required entries to ACL 59
+- name: Add required entries to SNMP ACL
   hosts: nxos
   connection: network_cli
   gather_facts: false
