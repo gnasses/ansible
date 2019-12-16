@@ -9,7 +9,7 @@
     ansible_network_os: nxos
 
   roles:
-    - role: '/var/lib/awx/projects/_72___audits_and_enhancements/roles/network-engine'
+    - role: '/var/lib/awx/projects/myproject/roles/network-engine'
 
   tasks: 
    - name: Check for valid file and register checksum
@@ -47,7 +47,7 @@
       
    - name: FTP new image file if file with valid checksum not present
      cli_command:
-       command: "copy ftp://10.87.32.180/{{current_nxos_9k_version}} bootflash:{{current_nxos_9k_version}} vrf default"
+       command: "copy ftp://10.1.1.1/{{current_nxos_9k_version}} bootflash:{{current_nxos_9k_version}} vrf default"
        check_all: True
        prompt: 
          - 'Enter username:'
@@ -58,7 +58,7 @@
          - '{{ftp_password}}'
      when: 
        - "not (current_ver_checksum in filepresent.stdout[0])" 
-       - "freespace > 1011037696"
+       - "freespace > 1100000000"
 
 - name: Verify checksum switch 1
   hosts: 
