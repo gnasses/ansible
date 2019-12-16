@@ -1,6 +1,6 @@
 ---
 - name: basic server port configuration 
-  hosts: mlsmn013wkrm10
+  hosts: nexusupgrade1
   connection: local
   gather_facts: false
 
@@ -16,7 +16,7 @@
 
 
 - name: basic server port verification
-  hosts:  mlsmn013wkrm10
+  hosts:  nexusupgrade1
   connection: local
   gather_facts: false
  
