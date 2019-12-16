@@ -1,7 +1,8 @@
 ---
 - name: Backout Template 2, Downgrade N9K Code 
-  hosts: mlsmn013wkrm10
+  hosts: nexusupgrade1 nexusupgrade2
   connection: network_cli
+  serial: 1
   gather_facts: no
 
   tasks: 
