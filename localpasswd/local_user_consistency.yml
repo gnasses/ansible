@@ -1,0 +1,43 @@
+---
+
+- name: Local users compliance
+  hosts: all
+  connection: network_cli
+  gather_facts: false
+  tasks:
+  
+   - name: IOS BACKUP CONFIG
+     ios_config:
+       backup: yes
+     when: ansible_network_os == 'ios'
+
+   - name: NXOS BACKUP CONFIG
+     nxos_config:
+       backup: yes    
+     when: ansible_network_os == 'nxos'
+     
+   - name: IOS remove local users except these listed users
+     ios_user:
+       aggregate:
+         - name: gnasses
+         - name: technician
+       purge: yes
+     when: ansible_network_os == 'ios'
+
+   - name: NXOS remove local users except admin and these listed users
+     nxos_user:
+       aggregate:
+         - name: gnasses
+         - name: technician
+       purge: yes
+     when: ansible_network_os == 'nxos'    
+
+   - name: Save IOS Configuration
+     ios_command:
+       commands: "write memory"
+     when: ansible_network_os == 'ios'      
+
+   - name: Save NXOS Configuration
+     nxos_command:
+       commands: "copy running-config startup-config"
+     when: ansible_network_os == 'nxos'
