@@ -1,0 +1,20 @@
+---
+
+- hosts: asaiselabvpn01
+  gather_facts: false
+  connection: network_cli
+  become_method: enable
+  become: yes
+  gather_facts: false
+  
+  
+  tasks:
+  - name: Display Configured Users
+    ignore_errors: yes
+    retries: 0
+    asa_command:
+      commands: "sh running-config user"
+    register: show_run_users
+
+  - name: first debug
+    debug: var=show_run_users
