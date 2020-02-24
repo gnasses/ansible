@@ -1,0 +1,17 @@
+[nxos]
+NX93180 ansible_host=10.1.1.1
+
+[ios]
+ASR1001-x ansible_host=10.2.2.2
+
+[asa]
+vpn01 ansible_host=10.3.3.3
+
+[nxos:vars]
+ansible_network_os=nxos
+
+[ios:vars]
+ansible_network_os=ios
+
+[asa:vars]
+ansible_network_os=asa
