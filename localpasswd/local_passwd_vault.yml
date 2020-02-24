@@ -1,0 +1,33 @@
+---
+
+- name:  Set Local User Password from Vaulted Variable
+  hosts: all
+  connection: network_cli
+  gather_facts: false
+
+  vars:
+    user_pass: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          38663164336661643233623532626633616532623035646338353932613031323531353634373463
+          3762333937383031613665396163316662663066373966370a636236633338336161336566633464
+          32633834623133613365376262386236373562326435303263656266376334356463363038633661
+          3735336237646635310a363966376333643535313634326439353838343736313130356163623836
+          6263
+  tasks:
+   - name: IOS Create Standard Local Admin Password
+     ios_user:
+       name: gnasses
+       configured_password: "{{ user_pass }}"
+       privilege: 15
+       update_password: always
+       state: present
+     when: ansible_network_os == 'ios'
+
+   - name: NXOS Create Standard Local Admin Password
+     nxos_user:
+       name: gnasses
+       role: network-admin
+       configured_password: "{{ user_pass }}"
+       update_password: always
+       state: present
+     when: ansible_network_os == 'nxos'
