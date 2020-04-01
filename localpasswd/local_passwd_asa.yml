@@ -1,6 +1,6 @@
 ---
 
-- hosts: asaiselabvpn01
+- hosts: asatesthost
   gather_facts: false
   connection: network_cli
   become_method: enable
