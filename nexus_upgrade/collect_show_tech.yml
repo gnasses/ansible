@@ -1,0 +1,30 @@
+---
+- name: Collect Show-Tech Detail before upgrade
+  hosts: '{{switch1}}'
+  connection: network_cli
+  gather_facts: false
+  
+  roles:
+    - role: ansible-network.network-engine
+
+  tasks: 
+   - name: FTP Cisco TAC-PAC compressed show-tech
+     cli_command:
+       command: "tac-pac ftp://10.87.32.180/{{switch1}}-plm-tac-pac.gz vrf default"
+       check_all: True
+       prompt: 
+         - 'Enter username:'
+         - 'Password:'
+
+       answer: 
+         - '{{ftp_user}}'
+         - '{{ftp_password}}'  
+     vars:
+       ansible_command_timeout: 6000         
+     register: ftp_copy
+   - debug: var=ftp_copy
+
+   - assert:
+       that:
+         - "'Transfer of file Completed Successfully' in ftp_copy.stdout"
+
