@@ -1,0 +1,15 @@
+---
+
+- name: Cleanup NXOS authentication ACS entries
+  hosts: all
+  connection: network_cli
+  gather_facts: false
+
+  tasks:
+
+       - name: Cleanup old TACACS Servers 1
+         nxos_config:
+           lines: 
+             - no tacacs-server host 1.1.1.1
+             - no tacacs-server host 2.2.2.2
+         when: ansible_network_os == 'nxos'
