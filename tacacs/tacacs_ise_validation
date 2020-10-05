@@ -1,0 +1,48 @@
+---
+
+- name: Validate Authentication using ISE
+  hosts: all
+  connection: network_cli
+  gather_facts: false
+
+  tasks:
+
+   - name: ISE Authentication Verification
+     block:
+       - name: IOS Login Test to ISE
+         ios_command:
+           commands: 'test aaa group tacacs+ {{ username }} {{ password }} new-code'
+         register: isetest
+         when: ansible_network_os == 'ios'
+       - debug: var=isetest.stdout
+         when: ansible_network_os == 'ios'
+       
+       - name: NXOS Login Test to ISE
+         nxos_command:
+           commands: 'test aaa group my_tacacs {{ username }} {{ password }}'
+         register: isetest
+         when: ansible_network_os == 'nxos'
+       - debug: var=isetest.stdout
+         when: ansible_network_os == 'nxos' 
+   
+       - name: Affirm Login Success
+         assert:
+           that:
+             - "'authenticated' in isetest.stdout[0]"
+         when: ansible_network_os == 'nxos'             
+
+       - name: Save NXOS Configuration
+         nxos_command:
+           commands: "copy running-config startup-config"
+         when: ansible_network_os == 'nxos'
+         register: save 
+       - debug: var=save.stdout
+         when: ansible_network_os == 'nxos'                
+
+       - name: Save IOS Configuration
+         ios_command:
+           commands: "write memory"
+         when: ansible_network_os == 'ios'
+         register: save 
+       - debug: var=save.stdout
+         when: ansible_network_os == 'ios'    
