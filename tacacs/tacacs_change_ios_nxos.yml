@@ -1,0 +1,207 @@
+---
+
+- name: Update NXOS from ACS to ISE
+  hosts: all
+  connection: network_cli
+  gather_facts: false
+
+  tasks:
+
+   - name: NXOS TACACS INFO COLLECTION 1
+     nxos_command:
+       commands: 'show run | i "tacacs-server host 1.1.1.1"'
+     register: nxos1
+     when: ansible_network_os == 'nxos'
+
+   - name: NXOS TACACS INFO COLLECTION 2
+     nxos_command:
+       commands: 'show run | i "tacacs-server host 2.2.2.2"'
+     register: nxos2
+     when: ansible_network_os == 'nxos'
+
+   - name: SET NXOS TACACS_TYPE FACT TO VALIDATE 
+     set_fact:
+       tacacs_type: nxos
+     when:
+       - ansible_network_os == 'nxos'           
+       - "'tacacs-server host 1.1.1.1' in nxos1.stdout"
+       - "'tacacs-server host 2.2.2.2' in nxos2.stdout"  
+
+   - name: IOS TACACS CLASSIC INFO COLLECTION 1 
+     ios_command:
+       commands: 'show run | i tacacs server servername1'
+     register: ios1
+     when: ansible_network_os == 'ios'  
+
+   - name: IOS TACACS CLASSIC INFO COLLECTION 2
+     ios_command:
+       commands: 'show run | i tacacs server servername2'
+     register: ios2
+     when: ansible_network_os == 'ios'
+
+   - name: IOS TACACS ALTERNATE INFO COLLECTION 1
+     ios_command:
+       commands: 'show run | i tacacs-server host 1.1.1.1'
+     register: ios11
+     when: ansible_network_os == 'ios'
+
+   - name: IOS TACACS ALTERNATE INFO COLLECTION 2               
+     ios_command:
+       commands: 'show run | i tacacs-server host 2.2.2.2'
+     register: ios22
+     when: ansible_network_os == 'ios'  
+
+   - name: SET IOS TACACS_TYPE CLASSIC  
+     set_fact:
+       tacacs_type: classic
+     when:
+       - ansible_network_os == 'ios'           
+       - "'tacacs server servername1' in ios1.stdout"
+       - "'tacacs server servername2' in ios2.stdout"  
+      
+   - name: SET IOS TACACS_TYPE ALTERNATE  
+     set_fact:
+       tacacs_type: alternate
+     when:
+       - ansible_network_os == 'ios'           
+       - "'tacacs-server host 1.1.1.1' in ios11.stdout"
+       - "'tacacs-server host 2.2.2.2' in ios22.stdout" 
+
+   - name: SHOW TACACS TYPE
+     debug: var=tacacs_type
+      
+   - name: NXOS TACACS UPDATE TO DC1 ISE 1 
+     nxos_config:
+       lines: 
+         - "tacacs-server host 3.3.3.3 key 0 liS0Jsq0 port 49" 
+         - "tacacs-server host 4.4.4.4 key 0 liS0Jsq0 port 49"  
+         - "tacacs-server directed-request"
+         - "no tacacs-server host 1.1.1.1"
+         - "no tacacs-server host 2.2.2.2"             
+     when: 
+       - ansible_network_os == 'nxos'
+       - dc_group == 'ctc'
+       - tacacs_type == 'nxos'
+
+   - name: NXOS TACACS UPDATE TO DC2 ISE 1 
+     nxos_config:
+       lines: 
+         - "tacacs-server host 4.4.4.4 key 0 liS0Jsq0 port 49"            
+         - "tacacs-server host 3.3.3.3 key 0 liS0Jsq0 port 49" 
+         - "tacacs-server directed-request"
+         - "no tacacs-server host 1.1.1.1"
+         - "no tacacs-server host 2.2.2.2"             
+     when: 
+       - ansible_network_os == 'nxos'
+       - dc_group == 'elr'
+       - tacacs_type == 'nxos'       
+
+   - name: NXOS TACACS UPDATE TO DC1 ISE 2 
+     nxos_config:
+       lines: 
+         - "server 3.3.3.3"  
+         - "server 4.4.4.4"
+         - "no server 1.1.1.1"
+         - "no server 2.2.2.2"
+       parents: "aaa group server tacacs+ uhg_tacacs"         
+     when: 
+       - ansible_network_os == 'nxos'
+       - dc_group == 'ctc'
+       - tacacs_type == 'nxos'       
+
+   - name: NXOS TACACS UPDATE TO DC2 ISE 2 
+     nxos_config:
+       lines: 
+         - "server 4.4.4.4"
+         - "server 3.3.3.3"
+         - "no server 1.1.1.1"
+         - "no server 2.2.2.2"
+       parents: "aaa group server tacacs+ uhg_tacacs"         
+     when: 
+       - ansible_network_os == 'nxos'
+       - dc_group == 'elr'
+       - tacacs_type == 'nxos'       
+         
+   - name: DC2 Remove Classic TACACS config and Add 1st ISE
+     ios_config:
+       lines:
+         - address ipv4 4.4.4.4
+         - key 7 030852385625325D1E
+         - timeout 30
+       parents: tacacs server prodISE1
+       before: 
+         - no tacacs server servername2
+     when: 
+       - tacacs_type == 'classic'
+       - dc_group == 'elr'
+       - ansible_network_os == 'ios'
+
+   - name: DC2 Remove Classic TACACS config and Add 2nd ISE 
+     ios_config:
+       lines:
+         - address ipv4 3.3.3.3
+         - key 7 030852385625325D1E
+         - timeout 30
+       parents: tacacs server prodISE2
+       before: 
+         - no tacacs server servername1       
+     when: 
+       - tacacs_type == 'classic' 
+       - dc_group == 'elr'
+       - ansible_network_os == 'ios'
+
+   - name: DC1 Remove Classic TACACS config and Add 1st ISE
+     ios_config:
+       lines:
+         - address ipv4 3.3.3.3
+         - key 7 030852385625325D1E
+         - timeout 30
+       parents: tacacs server prodISE1
+       before: 
+         - no tacacs server servername1
+     when: 
+       - tacacs_type == 'classic'
+       - dc_group == 'ctc'
+       - ansible_network_os == 'ios'
+
+   - name:  DC1 Remove Classic TACACS config and Add 2nd ISE 
+     ios_config:
+       lines:
+         - address ipv4 4.4.4.4
+         - key 7 030852385625325D1E
+         - timeout 30
+       parents: tacacs server prodISE2
+       before: 
+         - no tacacs server servername2       
+     when: 
+       - tacacs_type == 'classic' 
+       - dc_group == 'ctc'
+       - ansible_network_os == 'ios'
+
+   - name: DC2 Move Alternate TACACS config to ISE
+     ios_config:
+       lines:
+         - tacacs-server host 4.4.4.4       
+         - tacacs-server host 3.3.3.3
+         - tacacs-server key 0 liS0Jsq0
+       before: 
+         - no tacacs-server host 1.1.1.1
+         - no tacacs-server host 2.2.2.2
+     when: 
+       - tacacs_type == 'alternate'
+       - dc_group == 'elr'
+       - ansible_network_os == 'ios'
+
+   - name: DC1 Move Alternate TACACS config to ISE
+     ios_config:
+       lines:
+         - tacacs-server host 3.3.3.3
+         - tacacs-server host 4.4.4.4
+         - tacacs-server key 0 liS0Jsq0
+       before: 
+         - no tacacs-server host 1.1.1.1
+         - no tacacs-server host 2.2.2.2
+     when: 
+       - tacacs_type == 'alternate'  
+       - dc_group == 'ctc'
+       - ansible_network_os == 'ios'
