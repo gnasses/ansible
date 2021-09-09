@@ -1,0 +1,87 @@
+---
+- name: Configure L3 addresses on routers in Blue group
+  hosts: blue
+  connection: network_cli
+  gather_facts: false
+
+  vars_files:
+   - creds.yml
+ 
+  vars:
+    ansible_user : "{{username}}"
+    ansible_ssh_password: "{{password}}"
+  tasks:
+   - name: Config IP Addresses  
+     cisco.iosxr.iosxr_l3_interfaces:
+       config:
+       - name: "{{interface1}}"
+         ipv4:
+         - address: "{{address1}}"
+       - name: "{{interface2}}"
+         ipv4:
+         - address: "{{address2}}"          
+       - name: "{{interface3}}"
+         ipv4:
+         - address: "{{address3}}"
+       - name: "{{interface4}}"
+         ipv4:
+         - address: "{{address4}}"
+       state: merged
+
+- name: Configure L3 addresses on routers in Green group
+  hosts: green
+  connection: network_cli
+  gather_facts: false
+
+  vars_files:
+   - creds.yml
+ 
+  vars:
+    ansible_user : "{{username}}"
+    ansible_ssh_password: "{{password}}"
+  tasks:
+   - name: Config IP Addresses   
+     cisco.iosxr.iosxr_l3_interfaces:
+       config:
+       - name: "{{interface1}}"
+         ipv4:
+         - address: "{{address5}}"
+       - name: "{{interface2}}"
+         ipv4:
+         - address: "{{address6}}"          
+       - name: "{{interface3}}"
+         ipv4:
+         - address: "{{address7}}"
+       - name: "{{interface4}}"
+         ipv4:
+         - address: "{{address8}}"
+       state: merged
+
+- name: Enable Configured Ethernet interfaces
+  hosts: all
+  connection: network_cli
+  gather_facts: false
+
+  vars_files:
+   - creds.yml
+ 
+  vars:
+    ansible_user : "{{username}}"
+    ansible_ssh_password: "{{password}}"
+  tasks:
+   - name: Enable interfaces
+     cisco.iosxr.iosxr_interfaces:
+       config:
+       - name: "{{interface1}}"
+         description: Configured by Ansible
+         enabled: true    
+       - name: "{{interface2}}"
+         description: Configured by Ansible
+         enabled: true
+       - name: "{{interface3}}"
+         description: Configured by Ansible
+         enabled: true
+       - name: "{{interface4}}"
+         description: Configured by Ansible
+         enabled: true      
+       state: merged
